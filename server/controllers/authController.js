@@ -137,7 +137,7 @@ export const updateProfileController = async (req, res) => {
             message: "For profile update, firstName and lastname is required"
          })
       }
-      const user = await User.findByIdAndUpdate(req.user.userId, { firstName, lastName, color, profileSetup: true }, {new: true, runValidators: true})
+      const user = await User.findByIdAndUpdate(req.user.userId, { firstName, lastName, color, profileSetup: true }, {new: true, runValidators: true}).select('-password')
       return res.status(200).send({
          success: true,
          message: "user profile updated successful",

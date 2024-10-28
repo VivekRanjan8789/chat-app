@@ -13,13 +13,14 @@ import axios from "axios";
 const Profile = () => {
   const navigate = useNavigate();
   const { auth, setAuth } = useContext(AuthContext);
+  console.log("auth is: ", auth);
+  
   const fileInputRef = useRef(null);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [image, setImage] = useState("");
-  const [imagemimeType, setImagemimeType] = useState("")
-  const [imageUpdate, setImageUpdate] = useState(false)
+  // const [imageUpdate, setImageUpdate] = useState(false)
   const [hovered, setHovered] = useState("");
   const [selectedColor, setSelectedColor] = useState(0);
 
@@ -29,13 +30,11 @@ const Profile = () => {
       setFirstName(auth?.user?.firstName);
       setLastName(auth?.user?.lastName);
       setSelectedColor(auth?.user?.color);
+      setImage(auth?.user?.image)
     }
   }, [auth]);
 
- useEffect(()=>{
-  getProfilePhoto();
- },[auth, imageUpdate])
-
+  
   // validate update-profile
   const validateProfile = () => {
     if (!firstName) {
@@ -50,21 +49,111 @@ const Profile = () => {
   };
 
   // update changes in profile
-  const saveChanges = async () => {
-    if (validateProfile()) {
-      try {
-        const response = await axios.post(
-          `${import.meta.env.VITE_SERVER_API}/auth/update-profile`,
-          { firstName, lastName, color: selectedColor },
-          { withCredentials: true }
-        );
+const saveChanges = async () => {
+  if (validateProfile()) {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_SERVER_API}/auth/update-profile`,
+        { firstName, lastName, color: selectedColor },
+        { withCredentials: true }
+      );
+      if(response.status===200){
         console.log(response);
         toast.success(response?.data?.message);
-        navigate("/chat");
-      } catch (error) {
-        console.log(error);
-        toast.error(error.response.data.message);
+        
+        setAuth({  // updating auth
+          ...auth,
+            user: {
+            ...auth.user,
+            firstName: response?.data?.user?.firstName,
+            lastName: response?.data?.user?.lastName,
+            color: response?.data?.user?.color,
+            profileSetup: response?.data?.user?.profileSetup
+            }
+        })
+
+        console.log("auth inside profile update: ", auth);
+        
+        
       }
+      // navigate("/chat");
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  }
+};
+
+  // handle file input click using ref by add button
+  const handleFileInputClick = () => {
+    fileInputRef.current.click();
+  };
+
+  //  upload profile photo
+  const handleImageChange = async (event) => {
+    const file = await event.target.files[0];
+    if(!file){
+        toast.error("file must required for profile update")
+        return;
+    }
+    const formData = new FormData()
+    formData.append('image', file)
+    try {
+        const response = await axios.post(`${import.meta.env.VITE_SERVER_API}/auth/update-profile-image`,  formData , {withCredentials: true})
+        console.log("profile update response is", response);
+        if(response.status===200){
+          toast.success(response?.data?.message || "profile image updated");
+          getProfilePhoto() // call for profile photo
+        }             
+    } catch (error) {
+        console.log(error);
+        toast.error(error?.response?.data?.message || "error while updating profile")
+    }
+  };
+
+
+  //get profile photo
+  const getProfilePhoto = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_SERVER_API}/auth/get-profile-photo`, { withCredentials: true});
+      if(response.status===200){
+          setImage(`data:${response?.data?.base64Image?.image?.mimeType};base64,${response?.data?.base64Image?.image?.imageData}`); 
+          
+          ({
+            ...auth,
+            user: {
+              ...auth.user,
+               image: `data:${response?.data?.base64Image?.image?.mimeType};base64,${response?.data?.base64Image?.image?.imageData}`               
+            }
+          })
+
+          console.log("auth inside profile photo update", auth);
+          
+      }
+
+    } catch (error) {
+       toast.error(error?.response?.data?.message || "error while fetching profile photo")
+    }
+ 
+  }
+
+  // delete profile photo
+  const handleDeleteImage = async() => {
+    try {
+      const response = await axios.patch(`${import.meta.env.VITE_SERVER_API}/auth/delete-profile-image`,{}, {withCredentials: true});
+      if(response.status===200){
+        toast.success(response?.data?.message || "profile image removed");
+        setImage("");
+        setAuth({
+           ...auth,
+           user: {
+             ...auth.user,
+             image: ""
+           }
+        })
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "error while removing profiloe photo")
     }
   };
 
@@ -77,63 +166,8 @@ const Profile = () => {
     }
   };
 
-  // handle file input click using ref by add button
-  const handleFileInputClick = () => {
-    fileInputRef.current.click();
-  };
-
-  // change image
-  const handleImageChange = async (event) => {
-     const file = await event.target.files[0];
-     if(!file){
-        toast.error("file must required for profile update")
-        return;
-     }
-     const formData = new FormData()
-     formData.append('image', file)
-     try {
-        const response = await axios.post(`${import.meta.env.VITE_SERVER_API}/auth/update-profile-image`,  formData , {withCredentials: true})
-        console.log("profile update response is", response);
-        if(response.status===200){
-          toast.success(response?.data?.message || "profile image updated");
-          setImageUpdate(true)
-        }             
-     } catch (error) {
-        console.log(error);
-        toast.error(error?.response?.data?.message || "error while updating profile")
-     }
-  };
-
-  // get profile photo
-  const getProfilePhoto = async () => {
-    try {
-      const response = await axios.get(`${import.meta.env.VITE_SERVER_API}/auth/get-profile-photo`, { withCredentials: true});
-      setImage(response?.data?.base64Image?.image?.imageData);
-      setImagemimeType(response?.data?.base64Image?.image?.mimeType);    
-    } catch (error) {
-       toast.error(error?.response?.data?.message || "error while fetching profile photo")
-    }
- 
-  }
-
-  // delete image
-  const handleDeleteImage = async() => {
-     try {
-      const response = await axios.patch(`${import.meta.env.VITE_SERVER_API}/auth/delete-profile-image`,{}, {withCredentials: true});
-      if(response.status===200){
-        toast.success(response?.data?.message || "profile image removed");
-        setImage("")
-        setImageUpdate(false);
-      }
-      setImageUpdate(false)  
-     } catch (error) {
-       toast.error(error?.response?.data?.message || "error while removing profiloe photo")
-     }
-  };
-
   return (
     <>
-      <div>{JSON.stringify(auth?.user?.email, null, 4)}</div>
       <div className="bg-[#1b1c24] h-[100vh] flex items-center justify-center flex-col gap-10">
         <div className="flex flex-col gap-10 w-[80vw] md:w-max">
           <div>
@@ -157,7 +191,7 @@ const Profile = () => {
               <Avatar className="h-32 w-32 md:w-48 md:h-48 rounded-full overflow-hidden">
                 {image ? (
                   <AvatarImage
-                    src={`data:${imagemimeType};base64,${image}`}
+                    src={image}
                     alt="profile"
                     className="object-cover w-full h-full bg-black"
                   />

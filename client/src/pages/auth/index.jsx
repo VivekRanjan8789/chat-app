@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { AuthContext } from "@/context/Auth";
 import axios from "axios";
 import Background from "../../assets/login2.png";
 import Victory from "../../assets/victory.svg";
@@ -10,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const { auth, setAuth } = useContext(AuthContext)
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -69,15 +71,26 @@ const Auth = () => {
         return;
        };
        const response = await axios.post(`${import.meta.env.VITE_SERVER_API}/auth/login`, {email, password}, {withCredentials: true}); 
-  
-       if(response?.status === 200){
-          if(response?.data?.user?.profileSetup){    
-            navigate('/chat')
-          }
-          else{
+       console.log("login user is: ", response);
+
+       setAuth({
+         ...auth,
+         user: {
+            ... response?.data?.user,
+            image: (response?.data?.user?.image?.mimeType && response?.data?.user?.image?.imageData)
+             ? `data:${response.data.user.image.mimeType};base64,${response.data.user.image.imageData}`
+             : ""
+         } 
+       })
+
+      //  if(response?.status === 200){
+      //     if(response?.data?.user?.profileSetup){    
+      //       navigate('/chat')
+      //     }
+      //     else{
             navigate('/profile')
-          }
-       }
+      //     }
+      //  }
        toast.success("logged in");   
      } catch (error) {
         toast.error(error.response.data.message)

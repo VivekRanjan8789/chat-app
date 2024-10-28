@@ -14,9 +14,19 @@ const App = () => {
 
     const getProfile = async()=> {
       try {
-        const user = await axios.get(`${import.meta.env.VITE_SERVER_API}/auth/profile`, { withCredentials: true });
-        console.log(user);
-        setAuth({user: user.data.user});             
+        const response = await axios.get(`${import.meta.env.VITE_SERVER_API}/auth/profile`, { withCredentials: true });
+        console.log(response);
+        
+        setAuth({
+          ...auth,
+          user: {
+             ... response?.data?.user,
+             image: (response?.data?.user?.image?.mimeType && response?.data?.user?.image?.imageData)
+             ? `data:${response.data.user.image.mimeType};base64,${response.data.user.image.imageData}`
+             : ""
+          } 
+        })
+        
       } catch (error) {
         console.log(error);        
       }
