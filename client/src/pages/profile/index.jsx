@@ -32,7 +32,7 @@ const Profile = () => {
       setSelectedColor(auth?.user?.color);
       setImage(auth?.user?.image)
     }
-  }, [auth]);
+  }, [auth, navigate]);
 
   
   // validate update-profile
@@ -58,9 +58,7 @@ const saveChanges = async () => {
         { withCredentials: true }
       );
       if(response.status===200){
-        console.log(response);
-        toast.success(response?.data?.message);
-        
+        toast.success(response?.data?.message);        
         setAuth({  // updating auth
           ...auth,
             user: {
@@ -71,14 +69,9 @@ const saveChanges = async () => {
             profileSetup: response?.data?.user?.profileSetup
             }
         })
-
-        console.log("auth inside profile update: ", auth);
-        
-        
+        navigate("/chat");        
       }
-      // navigate("/chat");
     } catch (error) {
-      console.log(error);
       toast.error(error.response.data.message);
     }
   }

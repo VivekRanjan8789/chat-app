@@ -83,14 +83,14 @@ const Auth = () => {
          } 
        })
 
-      //  if(response?.status === 200){
-      //     if(response?.data?.user?.profileSetup){    
-      //       navigate('/chat')
-      //     }
-      //     else{
+       if(response?.status === 200){
+          if(response?.data?.user?.profileSetup){    
+            navigate('/chat')
+          }
+          else{
             navigate('/profile')
-      //     }
-      //  }
+          }
+       }
        toast.success("logged in");   
      } catch (error) {
         toast.error(error.response.data.message)

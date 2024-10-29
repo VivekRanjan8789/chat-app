@@ -13,20 +13,18 @@ const  Chat = () => {
    const navigate = useNavigate();
 
    useEffect(()=>{
-    console.log("auth is", auth);
-    
+    console.log("auth is in chat app", auth)   
       if(!(auth?.user?.profileSetup)){
-        console.log((auth?.user?.profileSetup));
-        
+        console.log("setup is: ", (auth?.user?.profileSetup));        
           navigate('/profile')
       }
-   },[auth])
+   },[auth?.user?.profileSetup])
 
   return (
     <div className='flex h-[100vh] text-white overflow-hidden'> 
          <ContactsContainer />
          {/* <EmptyChatContainer /> */}
-         <ChatContainer />
+         {/* <ChatContainer /> */}
     </div>
   )
 }
