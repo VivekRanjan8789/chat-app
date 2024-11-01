@@ -5,14 +5,17 @@ import { Toaster } from "sonner";
 import "./index.css";
 import App from "./App.jsx";
 import { AuthProvider } from "./context/Auth";
+import { SocketProvider } from "./context/SocketContext";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-   <AuthProvider>
-    <BrowserRouter>
+  // <StrictMode>
+  <AuthProvider>
+    <SocketProvider>
+      <BrowserRouter>
         <App />
         <Toaster closeButton />
-    </BrowserRouter>
-    </AuthProvider>
-  </StrictMode>
+      </BrowserRouter>
+    </SocketProvider>
+  </AuthProvider>
+  // </StrictMode>
 );

@@ -84,7 +84,7 @@ export const loginController = async (req, res) => {
       success: true,
       msg: "successfully logged in",
       user: {
-         id: user.id,
+         _id: user.id,
          email: user.email,
          profileSetup: user.profileSetup,
          firstName: user.firstName,
@@ -105,7 +105,9 @@ export const loginController = async (req, res) => {
 }
 
 // get user info
-export const getUserInfoController = async(req, res) => {
+export const 
+
+getUserInfoController = async(req, res) => {
     try {      
       const user = await User.findById(req.user.userId).select('-password');
       if(!user){

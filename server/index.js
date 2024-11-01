@@ -3,9 +3,14 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import mongoose from 'mongoose'
 import 'dotenv/config'
+import { setupSocket } from './socket.js'
 
 import authRoutes from './routes/authRoute.js'
+import contactRoutes from './routes/contactRoutes.js'
+
 import { requireSignin } from './middlewares/authMiddleware.js'
+import messageRoutes from './routes/messageRoutes.js'
+
 
 
 const app = express()
@@ -22,12 +27,16 @@ app.use(cookieParser());
 app.use(express.json());
 
 // routes middleware
-app.use('/api/v1/auth', authRoutes)
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/contact', contactRoutes);
+app.use('/api/v1/message', messageRoutes);
 
 // starting server
 const server = app.listen(port, ()=>{
     console.log(`server started at PORT: http://localhost:${port}`);
 })
+
+setupSocket(server)
 
 // connecting mongodb
 mongoose.connect(`${databaseURL}`)
