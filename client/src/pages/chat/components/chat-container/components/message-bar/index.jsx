@@ -7,43 +7,73 @@ import { IoSend } from "react-icons/io5";
 import { useAppStore } from "@/store";
 import { useSocket } from "@/context/SocketContext";
 import { toast } from "sonner";
-
+import axios from "axios";
 
 const MessageBar = () => {
+  const fileInputRef = useRef();   // for managing upload file click
   const { auth } = useContext(AuthContext);
-  const  socket  = useSocket();
-  const emojiRef = useRef();  // this useref for close the emoji picker when clicked on oyher part of screen
+  const socket = useSocket();
+  const emojiRef = useRef(); // this useref for close the emoji picker when clicked on oyher part of screen
   const { selectedChatType, selectedChatData } = useAppStore();
   const [message, setMessage] = useState("");
-  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false)
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
 
-  useEffect(()=>{
-     const handleClickOutSide = (event)=>{
-        if(emojiRef.current && !emojiRef.current.contains(event.target)){
-          setEmojiPickerOpen(false);
-        }
-     }
-     document.addEventListener("mousedown", handleClickOutSide);
-     return ()=>{
+  useEffect(() => {
+    const handleClickOutSide = (event) => {
+      if (emojiRef.current && !emojiRef.current.contains(event.target)) {
+        setEmojiPickerOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutSide);
+    return () => {
       document.removeEventListener("mousedown", handleClickOutSide);
-     }
-  },[emojiRef])
+    };
+  }, [emojiRef]);
 
   const handleAddEmoji = (emoji) => {
-     setMessage((msg)=> msg+ emoji.emoji);
+    setMessage((msg) => msg + emoji.emoji);
+  };
+
+  const handleSendMessage = async () => {
+    if (selectedChatType === "contact") {
+      socket.current.emit("sendMessage", {
+        sender: auth?.user?._id,
+        content: message,
+        recipient: selectedChatData._id,
+        messageType: "text",
+        fileURL: undefined,
+      });
+    }
+    setMessage("")
+  };
+
+  const handleAttachmentClick = () => {
+    fileInputRef.current.click();
   }
 
-  const handleSendMessage = async() => {
-       if(selectedChatType==='contact'){
-          socket.current.emit("sendMessage", {
-             sender: auth?.user?._id,
-             content: message,
-             recipient: selectedChatData._id,
-             messageType: "text",
-             fileURL: undefined
-          })
-       }
-  };
+  const handleAttachmentChange = async (event) => {
+      try {
+        const file = event.target.files[0];
+        const formData = new FormData()
+        formData.append('file', file);
+
+        const response = await axios.post(`${import.meta.env.VITE_SERVER_API}/message/file-upload`, formData , { withCredentials: true});
+        if(response.status===200 && response.data){
+           if( selectedChatType==='contact') {
+                socket.current.emit("sendMessage", {
+                sender: auth?.user?._id,
+                content: undefined,
+                recipient: selectedChatData._id,
+                messageType: "file",
+                fileURL: response.data.filePath,
+              }); 
+           }       
+        }
+      } catch (error) {
+        console.log(error);
+        toast.error(error?.response?.data?.message || "file haven't sent");
+      }
+  }
 
   return (
     // <>
@@ -58,23 +88,26 @@ const MessageBar = () => {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
-        <button className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all">
+        <button className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all" onClick={handleAttachmentClick}>
           <GrAttachment className="text-2xl" />
+        <input type="file" className="hidden" ref={fileInputRef} onChange={handleAttachmentChange}/>  {/*will handle file upload*/}
         </button>
         <div className="relative">
-          <button className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
-          onClick={()=>{setEmojiPickerOpen(true)}}
+          <button
+            className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
+            onClick={() => {
+              setEmojiPickerOpen(true);
+            }}
           >
             <RiEmojiStickerLine className="text-2xl" />
           </button>
-          <div className="absolute bottom-5 -right-20" ref = {emojiRef}>
-              <EmojiPicker  
-                theme="dark"
-                open={emojiPickerOpen}
-                onEmojiClick={handleAddEmoji}
-                autoFocusSearch={false}
-                
-              />
+          <div className="absolute bottom-5 -right-20" ref={emojiRef}>
+            <EmojiPicker
+              theme="dark"
+              open={emojiPickerOpen}
+              onEmojiClick={handleAddEmoji}
+              autoFocusSearch={false}
+            />
           </div>
         </div>
       </div>

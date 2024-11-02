@@ -1,4 +1,5 @@
 import Message from "../models/messageModel.js";
+import { mkdirSync, renameSync } from 'fs'
 
 export const getPrevMessages = async (req, res)=>{
      try {
@@ -23,6 +24,39 @@ export const getPrevMessages = async (req, res)=>{
             success: true,
             message: "chats fetched successfully",
             messages
+        })
+
+     } catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "error while fetching prev chats",
+            error
+         })
+     }
+}
+
+
+
+export const uploadFileController = async (req, res)=>{
+     try {
+        console.log("req.file is: ", req.file);
+        
+        if(!req.file){
+            return res.status(400).send({
+                success: false,
+                message: "file is missing. Not sent"
+            })
+        }
+
+        const date =  Date.now();
+        const fileDir = `uploads/files/${date}`;
+        const fileName = `${fileDir}/${req.file.originalname}`
+
+        mkdirSync(fileDir, { recursive: true})
+        renameSync(req.file.path, fileName);
+        return res.status(200).send({
+            success: true,
+            filePath: fileName
         })
 
      } catch (error) {

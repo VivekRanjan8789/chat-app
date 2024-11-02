@@ -23,6 +23,8 @@ app.use(cors({
     credentials: true
 }))
 
+app.use("/uploads/files", express.static("uploads/files"))
+
 app.use(cookieParser());
 app.use(express.json());
 
