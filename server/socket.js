@@ -63,7 +63,7 @@ export const setupSocket = (server) => {
         
     }
 
-    // sending message 
+    // sending personal message 
     socket.on("sendMessage", (message)=>{sendMessage(message)})
 
     // on disconnect this function will be implemented

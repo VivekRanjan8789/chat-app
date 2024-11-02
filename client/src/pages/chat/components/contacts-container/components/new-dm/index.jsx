@@ -141,11 +141,11 @@ const NewDM = () => {
 
                     <div className="flex flex-col">
                       <span>
-                        {contact?.firstName && contact?.lastName
-                          ? `${contact?.firstName} ${contact?.lastName}`
-                          : `${contact?.email}`}
+                        {contact.firstName && contact.lastName
+                          ? `${contact.firstName} ${contact.lastName}`
+                          : `${contact.email}`}
                       </span>
-                      <span className="text-xs">{contact?.email}</span>
+                      <span className="text-xs">{contact.email}</span>
                     </div>
                   </div>
                 ))}

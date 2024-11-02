@@ -73,7 +73,7 @@ const MessageBar = () => {
           },
         }
       );
-      
+
       if (response.status === 200 && response.data) {
         setIsUploading(false);
         if (selectedChatType === "contact") {
@@ -84,7 +84,7 @@ const MessageBar = () => {
             messageType: "file",
             fileURL: response.data.filePath,
           });
-        }
+        } 
       }
     } catch (error) {
       console.log(error);

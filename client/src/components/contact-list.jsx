@@ -4,8 +4,8 @@ import { getColor } from "@/lib/utils";
 import React from "react";
 
 const ContactList = ({ contacts, isChannel = false }) => {
-    console.log("contacts is: ", contacts);
-    
+  // console.log("contacts is: ", contacts);
+
   const {
     selectedChatData,
     setSelectedChatData,
@@ -16,10 +16,10 @@ const ContactList = ({ contacts, isChannel = false }) => {
 
   const handleClick = (contact) => {
     console.log("contact is: ", contact);
-    
+
     if (isChannel) setSelectedChatType("channel");
     else setSelectedChatType("contact");
-    setSelectedChatData(contact);
+    setSelectedChatData(contact);  // contact contains selected channel or contact which we select to chat
     if (selectedChatData && selectedChatData._id !== contact._id) {
       setSelectedChatMessages([]);
     }
@@ -49,7 +49,11 @@ const ContactList = ({ contacts, isChannel = false }) => {
                 ) : (
                   <div
                     className={`
-                    ${selectedChatData && selectedChatData._id === contact._id ? "bg-[#ffffff22] border-2 border-white/70" : getColor(contact.color) }
+                    ${
+                      selectedChatData && selectedChatData._id === contact._id
+                        ? "bg-[#ffffff22] border-2 border-white/70"
+                        : getColor(contact.color)
+                    }
                     uppercase h-12 w-12  text-lg border-[1px] flex items-center justify-center rounded-full ${getColor(
                       contact.selectedColor
                     )}`}
@@ -61,13 +65,16 @@ const ContactList = ({ contacts, isChannel = false }) => {
                 )}
               </Avatar>
             )}
-            {
-                isChannel && <div className="bg-[#ffffff22] h-10 w-10 flex items-center justify-center rounded-full">
-                    {
-                        isChannel ? <span>{contact.name}</span> : <span>{`${contact.firstName} ${contact.lastName}`}</span>
-                    }
-                </div>
-            }
+            {isChannel && (
+              <div className="bg-[#ffffff22] h-10 w-10 flex items-center justify-center rounded-full">
+                 #
+              </div>
+            )}
+            {isChannel ? (
+                  <span>{contact.name}</span>
+                ) : (
+                  <span>{`${contact.firstName} ${contact.lastName}`}</span>
+                )}
           </div>
         </div>
       ))}

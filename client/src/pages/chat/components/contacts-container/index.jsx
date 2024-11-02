@@ -4,12 +4,14 @@ import NewDM from "./components/new-dm";
 import axios from "axios";
 import { useAppStore } from "@/store";
 import ContactList from "@/components/contact-list";
+import CreateChannel from "./components/create-channel";
 
 const ContactsContainer = () => {
 
-  const { directMessagesContacts, setDirectMessagesContacts} = useAppStore()
+  const { directMessagesContacts, setDirectMessagesContacts, channels, setChannels} = useAppStore()
 
   useEffect(()=>{
+      // get contacts for DM
       const getContacts  = async () => {
           try {
             const response = await axios.get(`${import.meta.env.VITE_SERVER_API}/contact/get-contacts-for-dm`, { withCredentials: true});
@@ -22,6 +24,21 @@ const ContactsContainer = () => {
           }
       }
       getContacts();
+
+      // get channels either who created or who is the member
+      const getUserChannels  = async () => {
+        try {
+          const response = await axios.get(`${import.meta.env.VITE_SERVER_API}/channel/get-user-channel`, { withCredentials: true});
+          console.log("response id: ", response?.data?.channels);
+          
+          if(response.status === 200){
+            setChannels(response?.data?.channels)
+          }          
+        } catch (error) {
+           console.log(error);             
+        }
+    }
+       getUserChannels();
   },[])
 
   return (
@@ -41,6 +58,10 @@ const ContactsContainer = () => {
         <div className="my-5">
             <div className="flex items-center justify-between pr-10">
                 <Title text="Channels" />
+                <CreateChannel />
+            </div>
+            <div className="max-h-[38vh] overflow-y-auto scrollbar-hidden">
+                <ContactList contacts={channels} isChannel={true}/>
             </div>
         </div>
         <div>

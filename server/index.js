@@ -10,6 +10,7 @@ import contactRoutes from './routes/contactRoutes.js'
 
 import { requireSignin } from './middlewares/authMiddleware.js'
 import messageRoutes from './routes/messageRoutes.js'
+import channelRoutes from './routes/channelRoutes.js'
 
 
 
@@ -32,6 +33,7 @@ app.use(express.json());
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/contact', contactRoutes);
 app.use('/api/v1/message', messageRoutes);
+app.use('/api/v1/channel', channelRoutes);
 
 // starting server
 const server = app.listen(port, ()=>{
