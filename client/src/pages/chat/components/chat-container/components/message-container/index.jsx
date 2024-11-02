@@ -1,11 +1,12 @@
 import { useAppStore } from "@/store";
-import React, { useRef, useContext, useEffect } from "react";
+import React, { useRef, useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context/Auth";
 import moment from "moment";
 import axios from "axios";
 import { toast } from "sonner";
 import { MdFolderZip } from "react-icons/md";
 import { IoMdArrowRoundDown } from "react-icons/io";
+import { IoCloseSharp } from "react-icons/io5";
 
 const MessageContainer = () => {
   const scrollRef = useRef();
@@ -15,7 +16,12 @@ const MessageContainer = () => {
     selectedChatData,
     selectedChatMessages,
     setSelectedChatMessages,
+    setFileDownloadProgress,
+    setIsDownloading
   } = useAppStore();
+
+  const [showImage, setShowImage] = useState(false);
+  const [imageURL, setImageURL] = useState(null);
 
   useEffect(() => {
     const getMessages = async () => {
@@ -65,7 +71,7 @@ const MessageContainer = () => {
         <div key={message._id}>
           {showDate && (
             <div className="text-center text-gray-500 my-2">
-              {moment(message.timestamp).format("LL")}
+              {moment(message.timeStamp).format("LL")}
             </div>
           )}
           {selectedChatType === "contact" && renderDMMessages(message)}
@@ -76,12 +82,20 @@ const MessageContainer = () => {
 
   const downloadFile = async (fileURL) => {
     try {
+      setIsDownloading(true);
+      setFileDownloadProgress(0);
       const response = await axios.get(
         `${import.meta.env.VITE_IMAGE_URL}/${fileURL}`,
-        { responseType: "blob" }
+        { responseType: "blob", onDownloadProgress: (progressEvent) =>{
+           const { loaded, total } = progressEvent;
+           const percentCompleted = Math.round((loaded * 100) / total);
+           setFileDownloadProgress(percentCompleted);
+        } }
       );
       console.log(response);
-      const urlBlob = window.URL.createObjectURL(new Blob([response.data], { type: response.data.type }));
+      const urlBlob = window.URL.createObjectURL(
+        new Blob([response.data], { type: response.data.type })
+      );
       const link = document.createElement("a");
       link.href = urlBlob;
       link.setAttribute("download", fileURL.split("/").pop());
@@ -89,6 +103,8 @@ const MessageContainer = () => {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(urlBlob);
+      setIsDownloading(false);
+      setFileDownloadProgress(0);
     } catch (error) {
       console.error("Download failed", error);
     }
@@ -120,7 +136,13 @@ const MessageContainer = () => {
           } border inline-block p-4 rounded my-1 max-w-[50%] break-words`}
         >
           {checkIfImage(message.fileURL) ? (
-            <div className=" cursor-pointer">
+            <div
+              className=" cursor-pointer"
+              onClick={() => {
+                setShowImage(true);
+                setImageURL(message.fileURL);
+              }}
+            >
               <img
                 src={`${import.meta.env.VITE_IMAGE_URL}/${message.fileURL}`}
                 height={300}
@@ -144,7 +166,7 @@ const MessageContainer = () => {
         </div>
       )}
       <div className="text-xs text-gray-600">
-        {moment(message.timestamp).format("LT")}
+        {moment(message.timeStamp).format("LT")}
       </div>
     </div>
   );
@@ -153,6 +175,34 @@ const MessageContainer = () => {
     <div className=" flex-1 overflow-y-auto scrollbar-hidden p-4px-8 md:w-[65vw] lg:w-[70vw] xl:w-[80vw] w-full">
       {renderMessages()}
       <div ref={scrollRef} />
+      {showImage && (
+        <div className=" fixed z-1000 top-0 left-0 h-[100vh] w-[100vw] flex items-center justify-center backdrop-blur-lg flex-col">
+          <div>
+            <img
+              src={`${import.meta.env.VITE_IMAGE_URL}/${imageURL}`}
+              alt="image"
+              className="h-[80vh] w-full bg-cover"
+            />
+          </div>
+          <div className="flex gap-4 fixed top-0 mt-5">
+            <button className="bg-black/20 p-3 te2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300">
+              <IoMdArrowRoundDown
+                onClick={() => {
+                  downloadFile(imageURL);
+                }}
+              />
+            </button>
+            <button className="bg-black/20 p-3 te2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300">
+              <IoCloseSharp
+                onClick={() => {
+                  setImageURL(null);
+                  setShowImage(false);
+                }}
+              />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

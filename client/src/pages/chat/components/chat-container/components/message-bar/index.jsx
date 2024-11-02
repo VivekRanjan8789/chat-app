@@ -8,13 +8,19 @@ import { useAppStore } from "@/store";
 import { useSocket } from "@/context/SocketContext";
 import { toast } from "sonner";
 import axios from "axios";
+import { data } from "autoprefixer";
 
 const MessageBar = () => {
-  const fileInputRef = useRef();   // for managing upload file click
+  const fileInputRef = useRef(); // for managing upload file click
   const { auth } = useContext(AuthContext);
   const socket = useSocket();
   const emojiRef = useRef(); // this useref for close the emoji picker when clicked on oyher part of screen
-  const { selectedChatType, selectedChatData } = useAppStore();
+  const {
+    selectedChatType,
+    selectedChatData,
+    setIsUploading,
+    setFileUploadProgress,
+  } = useAppStore();
   const [message, setMessage] = useState("");
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
 
@@ -44,36 +50,48 @@ const MessageBar = () => {
         fileURL: undefined,
       });
     }
-    setMessage("")
+    setMessage("");
   };
 
   const handleAttachmentClick = () => {
     fileInputRef.current.click();
-  }
+  };
 
   const handleAttachmentChange = async (event) => {
-      try {
-        const file = event.target.files[0];
-        const formData = new FormData()
-        formData.append('file', file);
-
-        const response = await axios.post(`${import.meta.env.VITE_SERVER_API}/message/file-upload`, formData , { withCredentials: true});
-        if(response.status===200 && response.data){
-           if( selectedChatType==='contact') {
-                socket.current.emit("sendMessage", {
-                sender: auth?.user?._id,
-                content: undefined,
-                recipient: selectedChatData._id,
-                messageType: "file",
-                fileURL: response.data.filePath,
-              }); 
-           }       
+    try {
+      const file = event.target.files[0];
+      const formData = new FormData();
+      formData.append("file", file);
+      setIsUploading(true);
+      const response = await axios.post(
+        `${import.meta.env.VITE_SERVER_API}/message/file-upload`,
+        formData,
+        {
+          withCredentials: true,
+          onUploadProgress: (data) => {
+            setFileUploadProgress(Math.round((100 * data.loaded) / data.total));
+          },
         }
-      } catch (error) {
-        console.log(error);
-        toast.error(error?.response?.data?.message || "file haven't sent");
+      );
+      
+      if (response.status === 200 && response.data) {
+        setIsUploading(false);
+        if (selectedChatType === "contact") {
+          socket.current.emit("sendMessage", {
+            sender: auth?.user?._id,
+            content: undefined,
+            recipient: selectedChatData._id,
+            messageType: "file",
+            fileURL: response.data.filePath,
+          });
+        }
       }
-  }
+    } catch (error) {
+      console.log(error);
+      setIsUploading(false);
+      toast.error(error?.response?.data?.message || "file haven't sent");
+    }
+  };
 
   return (
     // <>
@@ -88,9 +106,18 @@ const MessageBar = () => {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
-        <button className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all" onClick={handleAttachmentClick}>
+        <button
+          className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
+          onClick={handleAttachmentClick}
+        >
           <GrAttachment className="text-2xl" />
-        <input type="file" className="hidden" ref={fileInputRef} onChange={handleAttachmentChange}/>  {/*will handle file upload*/}
+          <input
+            type="file"
+            className="hidden"
+            ref={fileInputRef}
+            onChange={handleAttachmentChange}
+          />{" "}
+          {/*will handle file upload*/}
         </button>
         <div className="relative">
           <button
