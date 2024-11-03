@@ -17,7 +17,11 @@ const ContactList = ({ contacts, isChannel = false }) => {
   const handleClick = (contact) => {
     console.log("contact is: ", contact);
 
-    if (isChannel) setSelectedChatType("channel");
+    if (isChannel){
+      console.log("channel change received");
+      
+      setSelectedChatType("channel");
+    }
     else setSelectedChatType("contact");
     setSelectedChatData(contact);  // contact contains selected channel or contact which we select to chat
     if (selectedChatData && selectedChatData._id !== contact._id) {
