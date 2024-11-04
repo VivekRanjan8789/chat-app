@@ -26,6 +26,7 @@ const MessageContainer = () => {
   const [imageURL, setImageURL] = useState(null);
 
   useEffect(() => {
+    // fetching messages of contacts when clicked on contacts
     const getMessages = async () => {
       try {
         const response = await axios.post(
@@ -33,21 +34,35 @@ const MessageContainer = () => {
           { id: selectedChatData._id },
           { withCredentials: true }
         );
-        // console.log("message ares: ", response.data.messages);
-
         if (response?.data?.messages) {
           setSelectedChatMessages(response.data.messages);
         }
       } catch (error) {
         console.log("error while fetching messages", error);
-        // toast.error(error?.data?.response?.message);
       }
     };
-    console.log(selectedChatData._id, selectedChatType._id);
+
+    // fetching channel messagess when clicked on channel
+    const getChannelMessages = async () => {
+      try {
+        console.log("chat id channel id", selectedChatData._id);       
+        const response = await axios.get(`${import.meta.env.VITE_SERVER_API}/channel/get-channel-messages/${selectedChatData._id}`, { withCredentials: true});
+        console.log(response);
+        if (response.status === 200) {
+          console.log("setSelectedChatMessages: ", response);         
+          setSelectedChatMessages(response?.data?.messages);
+        }
+      } catch (error) {
+        console.log(error);
+        toast.error(error?.response?.data?.message || "something went wrong");
+      }
+    };
 
     if (selectedChatData._id) {
       if (selectedChatType === "contact") {
         getMessages();
+      } else if (selectedChatType === "channel") {
+        getChannelMessages();
       }
     }
   }, [selectedChatType, selectedChatData, setSelectedChatMessages]);
@@ -149,7 +164,7 @@ const MessageContainer = () => {
 
   const renderChannelMessages = (message) => {
     const isCurrentUser = message.sender._id === auth?.user?._id;
-  
+
     return (
       <div
         className={`mt-5 mx-3 ${!isCurrentUser ? "text-left" : "text-right"}`}
@@ -167,43 +182,43 @@ const MessageContainer = () => {
         )}
 
         {message.messageType === "file" && (
-        <div
-          className={`${
-            isCurrentUser 
-              ? "bg-[#8417ff]/5 text-[#8417ff]/90 border-[#8417ff]/50"
-              : "bg-[#2a2b33]/5 text-white/80  border-[#ffffff]/20"
-          } border inline-block p-4 rounded my-1 max-w-[50%] break-words`}
-        >
-          {checkIfImage(message.fileURL) ? (
-            <div
-              className=" cursor-pointer"
-              onClick={() => {
-                setShowImage(true);
-                setImageURL(message.fileURL);
-              }}
-            >
-              <img
-                src={`${import.meta.env.VITE_IMAGE_URL}/${message.fileURL}`}
-                height={300}
-                width={300}
-              />
-            </div>
-          ) : (
-            <div className="flex items-center justify-center gap-4">
-              <span className="text-white/8 text-3xl bg-black/20 rounded-full  p-3">
-                <MdFolderZip />
-              </span>
-              <span>{message.fileURL.split("/").pop()}</span>
-              <span
-                className="bg-black/20 p-3 te2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
-                onClick={() => downloadFile(message.fileURL)}
+          <div
+            className={`${
+              isCurrentUser
+                ? "bg-[#8417ff]/5 text-[#8417ff]/90 border-[#8417ff]/50"
+                : "bg-[#2a2b33]/5 text-white/80  border-[#ffffff]/20"
+            } border inline-block p-4 rounded my-1 max-w-[50%] break-words`}
+          >
+            {checkIfImage(message.fileURL) ? (
+              <div
+                className=" cursor-pointer"
+                onClick={() => {
+                  setShowImage(true);
+                  setImageURL(message.fileURL);
+                }}
               >
-                <IoMdArrowRoundDown />
-              </span>
-            </div>
-          )}
-        </div>
-      )}
+                <img
+                  src={`${import.meta.env.VITE_IMAGE_URL}/${message.fileURL}`}
+                  height={300}
+                  width={300}
+                />
+              </div>
+            ) : (
+              <div className="flex items-center justify-center gap-4">
+                <span className="text-white/8 text-3xl bg-black/20 rounded-full  p-3">
+                  <MdFolderZip />
+                </span>
+                <span>{message.fileURL.split("/").pop()}</span>
+                <span
+                  className="bg-black/20 p-3 te2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
+                  onClick={() => downloadFile(message.fileURL)}
+                >
+                  <IoMdArrowRoundDown />
+                </span>
+              </div>
+            )}
+          </div>
+        )}
 
         {!isCurrentUser ? (
           // Display avatar, name, and timestamp for other users
@@ -241,8 +256,6 @@ const MessageContainer = () => {
       </div>
     );
   };
-  
-  
 
   const downloadFile = async (fileURL) => {
     try {

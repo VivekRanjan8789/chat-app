@@ -62,3 +62,41 @@ export const getUserChannelsController = async (req, res) => {
         })
      }
 }
+
+
+export const getChannelMessagesController = async (req, res) => {
+    try {
+        console.log("hello from channel controller");
+        
+        const { channelId } = req.params;
+        const channel = await Channel.findById(channelId).populate({
+            path: "messages",
+            populate: {
+                path: "sender",
+                select: "firstName lastName email _id image color",
+            },
+        });     
+        if (!channel) {
+            return res.status(404).send({
+                success: false,
+                message: "Channel not found",
+            });
+        }
+
+        const messages = channel.messages;
+        return res.status(200).send({
+            success: true,
+            message: "Messages fetched successfully",
+            messages,
+        });
+
+    } catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "Error while getting channel messages",
+            error
+        });
+    }
+};
+
+

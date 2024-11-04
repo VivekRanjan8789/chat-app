@@ -1,9 +1,7 @@
 import { useEffect, createContext, useContext, useRef } from "react";
-
 import { io } from "socket.io-client";
 import { AuthContext } from "./Auth.jsx";
 import { useAppStore } from "@/store/index.jsx";
-import { Contact, Type } from "lucide-react";
 
 const SocketContext = createContext();
 
@@ -14,12 +12,14 @@ export const useSocket = () => {
 export const SocketProvider = ({ children }) => {
   const { auth } = useContext(AuthContext);
   const socket = useRef();
+  const { selectedChatType, selectedChatData } = useAppStore.getState();
 
   useEffect(() => {
+    console.log("hloo from authContext", auth);
     if (auth?.user) {
       socket.current = io("http://localhost:3000", {
         withCredentials: true,
-        query: { userId: auth?.user?._id },
+        query: { userId: auth.user._id },
       });
 
       socket.current.on("connect", () => {
@@ -29,9 +29,13 @@ export const SocketProvider = ({ children }) => {
       // for contact messages
       const handleReceiveMessage = (message) => {
         console.log("message received from contact is : ", message);
+        const {
+          selectedChatType,
+          selectedChatData,
+          addMessage,
+          addContactInContactList,
+        } = useAppStore.getState();
 
-        const { selectedChatType, selectedChatData, addMessage } =
-          useAppStore.getState();
         if (
           (selectedChatType !== undefined &&
             selectedChatData._id === message.sender._id) ||
@@ -40,25 +44,31 @@ export const SocketProvider = ({ children }) => {
           console.log("message rcvd: ", message);
           addMessage(message);
         }
+        // Pass auth to addContactInContactList
+        addContactInContactList(message, auth);
       };
 
       // for channel messages
       const handleReceiveChannelMessages = (message) => {
         console.log("messages received in channel is: ", message);
-        const { selectedChatType, selectedChatData, addMessage } =
-          useAppStore.getState();
-        console.log("is equal: ", selectedChatData?._id, message?.channelId);
-        console.log("selected chat type is: ", selectedChatType);
-        console.log(typeof selectedChatData?._id);
-        console.log(typeof message?.channelId);
+        const {
+          selectedChatType,
+          selectedChatData,
+          addMessage,
+          addChannelInChannelList,
+        } = useAppStore.getState();
 
-        if (selectedChatData?._id === message?.channelId) {
+        if (
+          selectedChatType !== undefined &&
+          selectedChatData?._id === message?.channelId
+        ) {
           console.log("message in add message  is: ", message);
           addMessage(message);
         }
+        addChannelInChannelList(message);
       };
 
-      socket.current.on("receiveMessage", handleReceiveMessage); // for contact(DM) messages
+      socket.current.on("receiveMessage", handleReceiveMessage); // for contact (DM) messages
       socket.current.on(
         "receive-channel-message",
         handleReceiveChannelMessages
@@ -68,7 +78,7 @@ export const SocketProvider = ({ children }) => {
         socket.current.disconnect();
       };
     }
-  }, [auth]);
+  }, [auth, selectedChatType, selectedChatData]);
 
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>

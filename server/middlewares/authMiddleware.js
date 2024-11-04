@@ -2,13 +2,14 @@ import jwt from 'jsonwebtoken'
 
 export const requireSignin = async(req, res, next) => {
     try {
-        const token = req.cookies.jwt;                    
+        const token = req.cookies.jwt;     
+        console.log("middleware hitted");                     
         if(!token) return res.status(401).send({
             success: false,
             message: "token not found"
         })
         const decoded = await jwt.verify(token, process.env.JWT_SECRET_KEY); 
-        req.user = decoded;      
+        req.user = decoded;              
         next();       
     } catch (error) {
         return res.status(403).send({
