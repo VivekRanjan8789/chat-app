@@ -76,8 +76,6 @@ export const loginController = async (req, res) => {
       }
       res.cookie("jwt", await createToken(email, user.id),{
           maxAge: 3 * 24 * 60 * 60 * 1000,
-          secure: true,
-          sameSite: "None"
       })
       return res.status(200).send({
       success: true,
