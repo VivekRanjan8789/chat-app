@@ -5,6 +5,7 @@ import axios from "axios";
 import { useAppStore } from "@/store";
 import ContactList from "@/components/contact-list";
 import CreateChannel from "./components/create-channel";
+import { toast } from "sonner";
 
 const ContactsContainer = () => {
 
@@ -15,12 +16,11 @@ const ContactsContainer = () => {
       const getContacts  = async () => {
           try {
             const response = await axios.get(`${import.meta.env.VITE_SERVER_API}/contact/get-contacts-for-dm`, { withCredentials: true});
-            console.log("response id: ", response?.data?.contacts);
             
             setDirectMessagesContacts(response.data.contacts)
             
           } catch (error) {
-             console.log(error);             
+             toast.error("Failed to fetch contacts")          
           }
       }
       getContacts();
@@ -29,13 +29,12 @@ const ContactsContainer = () => {
       const getUserChannels  = async () => {
         try {
           const response = await axios.get(`${import.meta.env.VITE_SERVER_API}/channel/get-user-channel`, { withCredentials: true});
-          console.log("response id: ", response?.data?.channels);
           
           if(response.status === 200){
             setChannels(response?.data?.channels)
           }          
         } catch (error) {
-           console.log(error);             
+           toast.error("Failed to fetch channel lists");            
         }
     }
        getUserChannels();

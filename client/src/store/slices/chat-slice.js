@@ -80,16 +80,6 @@ export const createChatSlice = (set, get) => {
     },
 
     addContactInContactList: (message, auth) => {
-      console.log(
-        "hlooooooooooooooooooooooooooooooooooooooooooooooooooolllllllllllllllllllllloooooooooo"
-      );
-
-      console.log("message inside shuffle of contactdmmessage", message);
-
-      console.log("heloo 2");
-
-      console.log("auth is inside hloooooooo");
-
       const fromId =
         auth.user._id === message.sender._id
           ? message.recipient._id
@@ -98,8 +88,6 @@ export const createChatSlice = (set, get) => {
         auth.user._id === message.sender._id
           ? message.recipient
           : message.sender;
-      console.log("formId: ", fromId);
-      console.log("fromData: ", fromData);
 
       const dmContacts = get().directMessagesContacts;
       const index = dmContacts.findIndex((contact) => contact._id === fromId);

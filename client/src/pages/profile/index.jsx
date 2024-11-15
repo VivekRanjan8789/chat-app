@@ -13,7 +13,6 @@ import axios from "axios";
 const Profile = () => {
   const navigate = useNavigate();
   const { auth, setAuth } = useContext(AuthContext);
-  console.log("auth is: ", auth);
   
   const fileInputRef = useRef(null);
 
@@ -93,13 +92,11 @@ const saveChanges = async () => {
     formData.append('image', file)
     try {
         const response = await axios.post(`${import.meta.env.VITE_SERVER_API}/auth/update-profile-image`,  formData , {withCredentials: true})
-        console.log("profile update response is", response);
         if(response.status===200){
           toast.success(response?.data?.message || "profile image updated");
           getProfilePhoto() // call for profile photo
         }             
     } catch (error) {
-        console.log(error);
         toast.error(error?.response?.data?.message || "error while updating profile")
     }
   };
@@ -120,7 +117,6 @@ const saveChanges = async () => {
             }
           })
 
-          console.log("auth inside profile photo update", auth);
           
       }
 

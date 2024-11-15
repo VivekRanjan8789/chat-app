@@ -34,7 +34,6 @@ export const signupController = async(req, res, next) =>{
       })
         
      } catch (error) {
-      console.log(error);     
         return res.status(500).send({
            success: false,
            msg: "error while creating user",
@@ -94,8 +93,7 @@ export const loginController = async (req, res) => {
          }
       })
         
-     } catch (error) {
-      console.log(error);     
+     } catch (error) {  
         return res.status(500).send({
            success: false,
            msg: "error while creating user",

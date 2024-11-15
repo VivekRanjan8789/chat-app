@@ -46,10 +46,8 @@ const NewDM = () => {
         );
         if (response.status === 200 && searchTerm.length>0) {
           setSearchedContacts(response?.data?.contacts);
-          console.log(response?.data?.contacts);
         }
       } catch (error) {
-        console.log(error);
         toast.error(
           error?.response?.data?.message || "error while fetching contacts"
         );
@@ -59,7 +57,6 @@ const NewDM = () => {
 
   // set new contact
   const selectNewContact = (contact) => {
-    console.log("contact is: ", contact);   
     setOpenNewContactModal(false);
     setSearchedContacts([]);
     setSelectedChatData(contact);

@@ -17,7 +17,6 @@ import { toast } from "sonner";
 const ProfileInfo = () => {
   const navigate = useNavigate();
   const { auth, setAuth } = useContext(AuthContext);
-  console.log("auth in profile-info ", auth?.user);
 
   const handleLogoutUser =  () =>{
       document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";

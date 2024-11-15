@@ -39,8 +39,6 @@ export const getPrevMessages = async (req, res)=>{
 
 export const uploadFileController = async (req, res)=>{
      try {
-        console.log("req.file is: ", req.file);
-        
         if(!req.file){
             return res.status(400).send({
                 success: false,

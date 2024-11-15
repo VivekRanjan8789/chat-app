@@ -2,8 +2,7 @@ import jwt from 'jsonwebtoken'
 
 export const requireSignin = async(req, res, next) => {
     try {
-        const token = req.cookies.jwt;     
-        console.log("middleware hitted");                     
+        const token = req.cookies.jwt;                        
         if(!token) return res.status(401).send({
             success: false,
             message: "token not found"

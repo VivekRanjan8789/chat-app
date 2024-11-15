@@ -15,7 +15,6 @@ export const SocketProvider = ({ children }) => {
   const { selectedChatType, selectedChatData } = useAppStore.getState();
 
   useEffect(() => {
-    console.log("hloo from authContext", auth);
     if (auth?.user) {
       socket.current = io("http://localhost:3000", {
         withCredentials: true,
@@ -23,12 +22,10 @@ export const SocketProvider = ({ children }) => {
       });
 
       socket.current.on("connect", () => {
-        console.log("user connected: ", socket.current.id);
       });
 
       // for contact messages
       const handleReceiveMessage = (message) => {
-        console.log("message received from contact is : ", message);
         const {
           selectedChatType,
           selectedChatData,
@@ -41,7 +38,6 @@ export const SocketProvider = ({ children }) => {
             selectedChatData._id === message.sender._id) ||
           selectedChatData._id === message.recipient._id
         ) {
-          console.log("message rcvd: ", message);
           addMessage(message);
         }
         // Pass auth to addContactInContactList
@@ -50,7 +46,6 @@ export const SocketProvider = ({ children }) => {
 
       // for channel messages
       const handleReceiveChannelMessages = (message) => {
-        console.log("messages received in channel is: ", message);
         const {
           selectedChatType,
           selectedChatData,
@@ -62,7 +57,6 @@ export const SocketProvider = ({ children }) => {
           selectedChatType !== undefined &&
           selectedChatData?._id === message?.channelId
         ) {
-          console.log("message in add message  is: ", message);
           addMessage(message);
         }
         addChannelInChannelList(message);

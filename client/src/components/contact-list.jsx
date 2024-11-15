@@ -4,7 +4,6 @@ import { getColor } from "@/lib/utils";
 import React from "react";
 
 const ContactList = ({ contacts, isChannel = false }) => {
-  // console.log("contacts is: ", contacts);
 
   const {
     selectedChatData,
@@ -15,9 +14,6 @@ const ContactList = ({ contacts, isChannel = false }) => {
   } = useAppStore();
 
   const handleClick = (contact) => {
-    console.log("contact is: ", contact);
-    console.log("isChannel: ", isChannel);
-    
     if (isChannel){
       setSelectedChatType("channel");
     }

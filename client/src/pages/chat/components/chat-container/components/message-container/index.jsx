@@ -3,7 +3,7 @@ import React, { useRef, useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context/Auth";
 import moment from "moment";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast  } from "sonner";
 import { MdFolderZip } from "react-icons/md";
 import { IoMdArrowRoundDown } from "react-icons/io";
 import { IoCloseSharp } from "react-icons/io5";
@@ -38,22 +38,18 @@ const MessageContainer = () => {
           setSelectedChatMessages(response.data.messages);
         }
       } catch (error) {
-        console.log("error while fetching messages", error);
+        toast.error("Failed to load messages!")
       }
     };
 
     // fetching channel messagess when clicked on channel
     const getChannelMessages = async () => {
-      try {
-        console.log("chat id channel id", selectedChatData._id);       
+      try {   
         const response = await axios.get(`${import.meta.env.VITE_SERVER_API}/channel/get-channel-messages/${selectedChatData._id}`, { withCredentials: true});
-        console.log(response);
-        if (response.status === 200) {
-          console.log("setSelectedChatMessages: ", response);         
+        if (response.status === 200) {      
           setSelectedChatMessages(response?.data?.messages);
         }
       } catch (error) {
-        console.log(error);
         toast.error(error?.response?.data?.message || "something went wrong");
       }
     };
@@ -79,14 +75,9 @@ const MessageContainer = () => {
   };
 
   const renderMessages = () => {
-    console.log("selected chat type is inside message : ", selectedChatType);
-    console.log("selected chat messages", selectedChatMessages);
-
     let lastDate = null;
     return selectedChatMessages.map((message, index) => {
       const messageDate = moment(message.timeStamp).format("YYYY-MM-DD");
-
-      console.log("messageDate is: ", moment(message.timeStamp).format("LT"));
       
       const showDate = messageDate !== lastDate;
       lastDate = messageDate;
@@ -275,7 +266,6 @@ const MessageContainer = () => {
           },
         }
       );
-      console.log(response);
       const urlBlob = window.URL.createObjectURL(
         new Blob([response.data], { type: response.data.type })
       );

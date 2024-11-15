@@ -103,7 +103,6 @@ const MessageBar = () => {
         }
       }
     } catch (error) {
-      console.log(error);
       setIsUploading(false);
       toast.error(error?.response?.data?.message || "file haven't sent");
     }

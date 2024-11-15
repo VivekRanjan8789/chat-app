@@ -53,7 +53,6 @@ const Auth = () => {
           return;
         };
         const response = await axios.post(`${import.meta.env.VITE_SERVER_API}/auth/signup`,{email, password}, {withCredentials: true});
-        console.log(response?.data);
         
         if(response?.data?.success){
           toast.success("signup successful. Now, Please Login to use our chat application")
@@ -71,7 +70,6 @@ const Auth = () => {
         return;
        };
        const response = await axios.post(`${import.meta.env.VITE_SERVER_API}/auth/login`, {email, password}, {withCredentials: true}); 
-       console.log("login user is: ", response);
 
        setAuth({
          ...auth,

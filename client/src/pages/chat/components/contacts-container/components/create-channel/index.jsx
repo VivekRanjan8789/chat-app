@@ -35,13 +35,10 @@ const CreateChannel = () => {
   useEffect(()=>{
     const getAllContacts = async () => {
       const response = await axios.get(`${import.meta.env.VITE_SERVER_API}/contact/get-all-contacts`, { withCredentials: true});
-      console.log("all contacts for multiple select are: ", response);
-      
       if(response.status===200){
          setAllContacts(response?.data?.contacts)
       }
     }  
-    // console.log(response);  
     getAllContacts();
   },[])
 
@@ -62,7 +59,6 @@ const CreateChannel = () => {
               }
             }           
           } catch (error) {
-             console.log(error);
               toast.error(error?.response?.data?.message || "channel created unsuccessfull");
           }
   };

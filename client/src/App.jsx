@@ -6,6 +6,7 @@ import Profile from "./pages/profile/index.jsx";
 import Chat from "./pages/chat";
 import { AuthContext } from "./context/Auth.jsx";
 import axios from "axios";
+import { toast } from "sonner";
 
 const PrivateRoute = ({ children }) => {
   const { auth } = useContext(AuthContext);
@@ -30,7 +31,6 @@ const App = () => {
           `${import.meta.env.VITE_SERVER_API}/auth/profile`,
           { withCredentials: true }
         );
-        console.log(response);
   
         setAuth({
           ...auth,
@@ -44,7 +44,7 @@ const App = () => {
           },
         });
       } catch (error) {
-        console.log(error);
+
       } finally {
         const timer = setTimeout(() => setLoading(false), 1000);
       }

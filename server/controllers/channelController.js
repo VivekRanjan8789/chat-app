@@ -65,9 +65,7 @@ export const getUserChannelsController = async (req, res) => {
 
 
 export const getChannelMessagesController = async (req, res) => {
-    try {
-        console.log("hello from channel controller");
-        
+    try {        
         const { channelId } = req.params;
         const channel = await Channel.findById(channelId).populate({
             path: "messages",

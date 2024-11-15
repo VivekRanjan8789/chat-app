@@ -26,13 +26,10 @@ export const setupSocket = (server) => {
 
   // sendMessage Function  (DM)
   const sendMessage = async (message) => {
-    console.log("message received to server side", message);
+
 
     const senderSocketId = userSocketMap.get(message.sender);
     const recipientSocketId = userSocketMap.get(message.recipient);
-
-    console.log("sender: ", senderSocketId);
-    console.log("receiver: ", recipientSocketId);
 
     const createMessage = await Message.create(message);
     const messageData = await Message.findById(createMessage._id)
