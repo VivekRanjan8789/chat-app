@@ -6,7 +6,7 @@ export const setupSocket = (server) => {
   // connecting socket to http server
   const io = new SocketIOServer(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: ["http://localhost:5173", "https://chat-app-frontend-o40f.onrender.com"],
       methods: ["POST", "GET"],
       credentials: true,
     },
