@@ -3,31 +3,31 @@ import mongoose from "mongoose";
 const channelSchema = new mongoose.Schema({
     name: {
         type: String,
-        require: true
+        required: true
     },
     members: [{
          type: mongoose.Schema.ObjectId, 
          ref: "User",
-         require: true
+         required: true
     }],
     
     admin: {
         type: mongoose.Schema.ObjectId,
         ref: "User",
-        require: true
+        required: true
     },
     messages: [{
         type: mongoose.Schema.ObjectId,
         ref: "Message",
-        require: false
+        required: false
     }],
     createdAt: {
         type: Date,
-        default: Date.now()
+        default: Date.now
     },
     updatedAt: {
         type: Date,
-        default: Date.now()
+        default: Date.now
     }
 
 })

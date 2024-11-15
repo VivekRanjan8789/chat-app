@@ -20,7 +20,7 @@ const Chat = () => {
 
   useEffect(() => {
     console.log("auth is in chat app", auth);
-    if (!auth?.user?.profileSetup) {
+    if (!(auth?.user?.profileSetup)) {
       console.log("setup is: ", auth?.user?.profileSetup);
       navigate("/profile");
     }

@@ -33,6 +33,10 @@ const NewDM = () => {
 
   // handle search contact
   const handleSearchContact = async (searchTerm) => {
+    if (searchTerm.length === 0) {
+      setSearchedContacts([]);
+      return;
+    }
     if (searchTerm.length > 0) {
       try {
         const response = await axios.post(
@@ -40,7 +44,7 @@ const NewDM = () => {
           { searchTerm },
           { withCredentials: true }
         );
-        if (response.status === 200) {
+        if (response.status === 200 && searchTerm.length>0) {
           setSearchedContacts(response?.data?.contacts);
           console.log(response?.data?.contacts);
         }
@@ -106,7 +110,7 @@ const NewDM = () => {
           {/* contacts fetched */}
 
           {searchedContacts.length > 0 && (
-            <ScrollArea className=" h-[200px]">
+            <ScrollArea className=" h-[200px] ">
               <div className="flex flex-col gap-5">
                 {searchedContacts.map((contact) => (
                   <div
@@ -119,7 +123,7 @@ const NewDM = () => {
                   >
                     <div className="w-12 h-12 relative">
                       <Avatar className="h-12 w-12 rounded-full overflow-hidden">
-                        {contact.image ? (
+                        {contact?.image?.imageData ? (
                           <AvatarImage
                             src={`data:${contact.image.mimeType};base64,${contact.image.imageData}`}
                             alt="profile"
@@ -128,7 +132,7 @@ const NewDM = () => {
                         ) : (
                           <div
                             className={`uppercase h-12 w-12  text-lg border-[1px] flex items-center justify-center rounded-full ${getColor(
-                              contact.selectedColor
+                              contact.color
                             )}`}
                           >
                             {contact.firstName

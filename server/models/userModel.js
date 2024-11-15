@@ -4,20 +4,20 @@ import bcrypt from 'bcrypt'
 const userSchema =new mongoose.Schema({
   email: {
     type: String,
-    require: [true, "email is required"],
+    required: [true, "email is required"],
     unique: true
   },
   password: {
     type: String,
-    require: [true, "password is required"]
+    required: [true, "password is required"]
   },
   firstName: {
     type: String,
-    require: false
+    required: false
   },
   lastName: {
     type: String,
-    require: false
+    required: false
   },
   image: {
     imageData: {
@@ -31,7 +31,7 @@ const userSchema =new mongoose.Schema({
   },
   color: {
     type: Number,
-    require: false
+    required: false
   },
   profileSetup: {
      type: Boolean,

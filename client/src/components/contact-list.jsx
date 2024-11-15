@@ -43,7 +43,7 @@ const ContactList = ({ contacts, isChannel = false }) => {
           <div className="flex gap-5 items-center justify-start text-neutral-300">
             {!isChannel && (
               <Avatar className="h-10 w-10 rounded-full overflow-hidden">
-                {contact?.image ? (
+                {contact?.image?.imageData ? (
                   <AvatarImage
                     src={`data:${contact.image.mimeType};base64,${contact.image.imageData}`}
                     alt="profile"
@@ -57,8 +57,8 @@ const ContactList = ({ contacts, isChannel = false }) => {
                         ? "bg-[#ffffff22] border-2 border-white/70"
                         : getColor(contact.color)
                     }
-                    uppercase h-12 w-12  text-lg border-[1px] flex items-center justify-center rounded-full ${getColor(
-                      contact.selectedColor
+                    uppercase h-10 w-10  text-lg border-[1px] flex items-center justify-center rounded-full ${getColor(
+                      contact.color
                     )}`}
                   >
                     {contact?.firstName

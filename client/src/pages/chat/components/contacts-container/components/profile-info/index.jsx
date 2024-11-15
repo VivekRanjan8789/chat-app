@@ -42,7 +42,7 @@ const ProfileInfo = () => {
             ) : (
               <div
                 className={`uppercase h-12 w-12  text-lg border-[1px] flex items-center justify-center rounded-full ${getColor(
-                  auth?.user?.selectedColor
+                  auth?.user?.color
                 )}`}
               >
                 {auth?.user?.firstName

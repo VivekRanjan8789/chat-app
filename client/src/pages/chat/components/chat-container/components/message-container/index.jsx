@@ -85,6 +85,9 @@ const MessageContainer = () => {
     let lastDate = null;
     return selectedChatMessages.map((message, index) => {
       const messageDate = moment(message.timeStamp).format("YYYY-MM-DD");
+
+      console.log("messageDate is: ", moment(message.timeStamp).format("LT"));
+      
       const showDate = messageDate !== lastDate;
       lastDate = messageDate;
       return (
@@ -167,7 +170,7 @@ const MessageContainer = () => {
 
     return (
       <div
-        className={`mt-5 mx-3 ${!isCurrentUser ? "text-left" : "text-right"}`}
+        className={`mt-5  ${!isCurrentUser ? "text-left" : "text-right"}`}
       >
         {message.messageType === "text" && (
           <div
@@ -224,7 +227,7 @@ const MessageContainer = () => {
           // Display avatar, name, and timestamp for other users
           <div className="flex items-center justify-start gap-3">
             <Avatar className="h-8 w-8 rounded-full overflow-hidden">
-              {message?.sender?.image ? (
+              {message?.sender?.image?.imageData ? (
                 <AvatarImage
                   src={`data:${message.sender.image.mimeType};base64,${message.sender.image.imageData}`}
                   alt="profile"
@@ -291,7 +294,7 @@ const MessageContainer = () => {
   };
 
   return (
-    <div className=" flex-1 overflow-y-auto scrollbar-hidden p-4px-8 md:w-[65vw] lg:w-[70vw] xl:w-[80vw] w-full">
+    <div className=" flex-1 overflow-y-auto scrollbar-hidden p-4 px-8 md:w-[65vw] lg:w-[70vw] xl:w-[80vw] w-full">
       {renderMessages()}
       <div ref={scrollRef} />
       {showImage && (
