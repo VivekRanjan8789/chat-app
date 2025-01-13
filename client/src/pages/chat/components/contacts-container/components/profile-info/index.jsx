@@ -18,13 +18,17 @@ const ProfileInfo = () => {
   const navigate = useNavigate();
   const { auth, setAuth } = useContext(AuthContext);
 
-  const handleLogoutUser =  () =>{
-      document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      setAuth({
-        user: ""
-      })
-      toast.success("logout successflly")
-      navigate("/auth")
+  const handleLogoutUser =  async() =>{
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_SERVER_API}/auth/logout`, {}, {withCredentials: true});
+      if(response.status===200){
+        navigate('/auth');
+        setAuth(null);
+      }
+      
+    } catch (error) {
+       console.log(error);        
+    }
   }
 
   return (

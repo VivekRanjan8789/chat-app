@@ -247,3 +247,18 @@ export const deleteProfileImageController = async (req, res) => {
     });
   }
 };
+
+// logout // clear the cookie
+export const logout = async (req, res, next) => {
+  try {
+    res.cookie("jwt", "", {maxAge: 1, secure: true, sameSite: "None"});
+    return res.status(200).send("logout successfull");
+
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: "error while logout",
+      error,
+    });
+  }
+};
