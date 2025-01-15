@@ -1,5 +1,12 @@
 import Message from "../models/messageModel.js";
-import { mkdirSync, renameSync } from 'fs'
+import { v2 as cloudinary } from 'cloudinary';
+import fs from 'fs';
+
+cloudinary.config({ 
+    cloud_name: process.env.CLOUD_NAME, 
+    api_key: process.env.CLOUD_API_KEY, 
+    api_secret: process.env.CLOUD_API_SECRET
+  });
 
 export const getPrevMessages = async (req, res)=>{
      try {
@@ -38,30 +45,33 @@ export const getPrevMessages = async (req, res)=>{
 
 
 export const uploadFileController = async (req, res)=>{
-     try {
-        if(!req.file){
-            return res.status(400).send({
-                success: false,
-                message: "file is missing. Not sent"
-            })
-        }
+    try {
+       if(!req.file){
+           return res.status(400).send({
+               success: false,
+               message: "file is missing. Not sent"
+           })
+       }
+               
+       const uploadResult = await cloudinary.uploader.upload(req.file.path);
+       fs.unlink(req.file.path,
+           (err => {
+               if (err) console.log(err);
+               else {
+                   console.log("\nDeleted file: example_file.txt");
+               }
+           }));
 
-        const date =  Date.now();
-        const fileDir = `uploads/files/${date}`;
-        const fileName = `${fileDir}/${req.file.originalname}`
+       return res.status(200).send({
+           success: true,
+           filePath: uploadResult.secure_url
+       })
 
-        mkdirSync(fileDir, { recursive: true})
-        renameSync(req.file.path, fileName);
-        return res.status(200).send({
-            success: true,
-            filePath: fileName
+    } catch (error) {
+       return res.status(500).send({
+           success: false,
+           message: "can't upload this file",
+           error
         })
-
-     } catch (error) {
-        return res.status(500).send({
-            success: false,
-            message: "error while fetching prev chats",
-            error
-         })
-     }
+    }
 }

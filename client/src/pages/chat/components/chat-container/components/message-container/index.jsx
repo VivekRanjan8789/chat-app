@@ -129,7 +129,7 @@ const MessageContainer = () => {
               }}
             >
               <img
-                src={`${import.meta.env.VITE_IMAGE_URL}/${message.fileURL}`}
+                src={message.fileURL}
                 height={300}
                 width={300}
               />
@@ -192,7 +192,7 @@ const MessageContainer = () => {
                 }}
               >
                 <img
-                  src={`${import.meta.env.VITE_IMAGE_URL}/${message.fileURL}`}
+                  src={message.fileURL}
                   height={300}
                   width={300}
                 />
@@ -256,7 +256,7 @@ const MessageContainer = () => {
       setIsDownloading(true);
       setFileDownloadProgress(0);
       const response = await axios.get(
-        `${import.meta.env.VITE_IMAGE_URL}/${fileURL}`,
+        `${fileURL}`,
         {
           responseType: "blob",
           onDownloadProgress: (progressEvent) => {
@@ -291,7 +291,7 @@ const MessageContainer = () => {
         <div className=" fixed z-1000 top-0 left-0 h-[100vh] w-[100vw] flex items-center justify-center backdrop-blur-lg flex-col">
           <div>
             <img
-              src={`${import.meta.env.VITE_IMAGE_URL}/${imageURL}`}
+              src={imageURL}
               alt="image"
               className="h-[80vh] w-full bg-cover"
             />
